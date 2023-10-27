@@ -1,27 +1,42 @@
-# React + TypeScript + Vite
+# Data-Driven Poetry
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+This repo contains code for the Data-Driven Poetry in [CS 541 - Information Visualization](https://emilywall.github.io/vis/index.html) class at Emory University.
 
-Currently, two official plugins are available:
+Please check [https://idiotwu.github.io/CS541-DDPoetry/](https://idiotwu.github.io/CS541-DDPoetry/) for the production build.
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react/README.md) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+## Modifications Since M3
 
-## Expanding the ESLint configuration
+I realized that each category is calculated independently and is not a part of the whole, so stacked bar chart may not be suitable in my case. Therefore, I changed the design to an interactive globe where you can hover over a certain country to see details. The color of each country is determined by the maximum gap in all wealth groups, e.g., for data
 
-If you are developing a production application, we recommend updating the configuration to enable type aware lint rules:
+| Wealth Level | Primary Completion Rate |
+| ------------ | ----------------------- |
+| Poorest      | 0.1                     |
+| Poor         | 0.3                     |
+| Middle       | 0.7                     |
+| Rich         | 0.9                     |
+| Richest      | 1.0                     |
 
-- Configure the top-level `parserOptions` property like this:
+The largest gap is `Richest - Poorest = 0.9`. Greater gaps will be rendered in red colors and smaller gaps will be in greens.
 
-```js
-   parserOptions: {
-    ecmaVersion: 'latest',
-    sourceType: 'module',
-    project: ['./tsconfig.json', './tsconfig.node.json'],
-    tsconfigRootDir: __dirname,
-   },
-```
+Currently, I only visualized one indicator "primary completion rate" in this milestone. I will create a selection menu to switch between different indicators in the next milestone.
 
-- Replace `plugin:@typescript-eslint/recommended` to `plugin:@typescript-eslint/recommended-type-checked` or `plugin:@typescript-eslint/strict-type-checked`
-- Optionally add `plugin:@typescript-eslint/stylistic-type-checked`
-- Install [eslint-plugin-react](https://github.com/jsx-eslint/eslint-plugin-react) and add `plugin:react/recommended` & `plugin:react/jsx-runtime` to the `extends` list
+## Local Development Setup
+
+1. Install node.js (18 or 20): https://nodejs.org/en/download
+2. Clone this repository and `cd` to the root
+3. Install dependencies using
+   ```bash
+   npm install
+   ```
+4. Start a local server using
+   ```bash
+   npm run dev
+   ```
+5. Visit http://localhost:5173 for development build.
+
+## Feature Plans
+
+- [ ] Indicator selection dropdown
+- [ ] Year range selector
+- [ ] Bar chart/line chart switcher
+- [ ] Scrollytelling poetry

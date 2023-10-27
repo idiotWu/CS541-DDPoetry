@@ -1,0 +1,12 @@
+.popover {
+  display: none; // avoid flickering
+  position: fixed;
+  top: 0;
+  left: 0;
+  background: #eee;
+  border-radius: 4px;
+}
+
+.chart {
+  display: flex;
+}

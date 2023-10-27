@@ -1,4 +1,4 @@
-export default {
+module.exports = {
   root: true,
   extends: ['airbnb', 'airbnb/hooks', 'airbnb-typescript', 'prettier'],
   plugins: ['@typescript-eslint', 'only-warn', 'prettier', 'unused-imports'],

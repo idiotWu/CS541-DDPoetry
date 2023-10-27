@@ -1,0 +1,36 @@
+.legend {
+  display: flex;
+  flex-flow: column;
+  width: 300px;
+  position: absolute;
+  bottom: 10px;
+  left: 50%;
+  color: #ccc;
+  transform: translateX(-50%);
+}
+
+.title {
+  text-align: center;
+}
+
+.ruler {
+  height: 10px;
+  margin: 4px 0;
+  background: linear-gradient(90deg, #006837, #ffffbf, #a50026);
+}
+
+.tick-wrapper {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.tick {
+  &:first-child {
+    transform: translateX(-50%);
+  }
+
+  &:last-child {
+    transform: translateX(50%);
+  }
+}
