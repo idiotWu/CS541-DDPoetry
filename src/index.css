@@ -10,10 +10,20 @@
 html,
 body {
   height: 100%;
+}
+
+body {
+  color: #d3d3d3;
   padding: 0;
   margin: 0;
 }
 
 * {
   box-sizing: border-box;
+}
+
+/* hide slider ticks */
+.rs-slider-graduator > ol > li:before,
+.rs-slider-graduator > ol > li:last-child:after {
+  display: none !important;
 }

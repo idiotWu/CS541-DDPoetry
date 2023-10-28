@@ -13,8 +13,6 @@ async function dataFetcher(csvPath: string) {
     [country: string]: Entry;
   } = {};
 
-  console.log(csv);
-
   csv.forEach(row => {
     // skip empty data
     if (!row[COLUMN]) {

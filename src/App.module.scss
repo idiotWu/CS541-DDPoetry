@@ -1,0 +1,44 @@
+.app {
+  display: flex;
+}
+
+.sidebar {
+  display: flex;
+  flex-flow: column;
+  flex: 0 0 300px;
+  height: 100vh;
+  padding: 20px;
+  background: #000011;
+  border-right: 1px solid var(--rs-divider-border);
+}
+
+.option {
+  display: flex;
+  flex-flow: column;
+  width: 100%;
+}
+
+.dropdown {
+  width: 100%;
+}
+
+.label {
+  font-size: 14px;
+  margin-bottom: 10px;
+}
+
+.poetry {
+  overflow-y: auto;
+
+  h6 {
+    color: #ccc;
+  }
+
+  p {
+    margin: 0;
+  }
+}
+
+.verse {
+  margin-top: 20px;
+}

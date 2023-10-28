@@ -1,6 +1,6 @@
 import globeGL from 'globe.gl';
 import * as d3 from 'd3';
-import { useMemo, useRef, useEffect, useState } from 'react';
+import { useMemo, useRef, useEffect, useState, useCallback } from 'react';
 
 import { Legend, BarChart } from '@components';
 import type { Entry } from '@interfaces';
@@ -39,20 +39,36 @@ export function Globe({ indicator, data }: GlobeProps) {
     return d3.scaleSequential(v => d3.interpolateRdYlGn(1 - v));
   }, []);
   const globe = useMemo(() => globeGL(), []);
+  const minValue = Math.min(...data.map(d => d.difference));
   const maxValue = Math.max(...data.map(d => d.difference));
+
+  const resize = useCallback(() => {
+    globe.width(window.innerWidth - 250).height(window.innerHeight);
+  }, [globe]);
+
+  useEffect(() => {
+    window.addEventListener('resize', resize);
+
+    return () => {
+      window.removeEventListener('resize', resize);
+    };
+  }, [resize]);
 
   useEffect(() => {
     if (!globeDivRef.current) {
       return;
     }
 
-    // set color scale domain to [0, max_difference]
-    colorScale.domain([0, maxValue]);
+    resize();
+
+    // set color scale domain to [min_diff, max_diff]
+    colorScale.domain([minValue, maxValue]);
 
     const compositeData = composeData(data);
 
     globe
       .globeImageUrl(`${import.meta.env.BASE_URL}earth-topology.png`)
+      .backgroundImageUrl(`${import.meta.env.BASE_URL}night-sky.png`)
       .polygonsData(compositeData)
       .polygonAltitude(0.03)
       .polygonCapColor((d: any) =>
@@ -63,9 +79,13 @@ export function Globe({ indicator, data }: GlobeProps) {
       .polygonsTransitionDuration(300);
 
     globe.onPolygonHover((hoverD: any) => {
+      const controls = globe.controls();
+
       if (!hoverD || hoverD.country === emptyEntry.country) {
+        controls.autoRotate = true;
         setHoveredEntry(null);
       } else {
+        controls.autoRotate = false;
         setHoveredEntry(hoverD as Entry);
       }
 
@@ -76,12 +96,17 @@ export function Globe({ indicator, data }: GlobeProps) {
 
     // render
     globe(globeDivRef.current);
-  }, [colorScale, data, globe, maxValue]);
+
+    // auto rotate
+    const controls = globe.controls();
+    controls.autoRotate = true;
+    controls.autoRotateSpeed = 0.6;
+  }, [colorScale, data, globe, minValue, maxValue, resize]);
 
   return (
     <div className={styles.container}>
       <div className={styles.globe} ref={globeDivRef} />
-      <Legend min={0} max={maxValue} />
+      <Legend min={minValue} max={maxValue} />
       {hoveredEntry ? (
         <BarChart
           data={hoveredEntry}

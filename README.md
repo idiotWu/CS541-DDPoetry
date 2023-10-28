@@ -34,7 +34,7 @@ Currently, I only visualized one indicator "primary completion rate" in this mil
    ```
 5. Visit http://localhost:5173 for development build.
 
-## Feature Plans
+## Future Plans
 
 - [ ] Indicator selection dropdown
 - [ ] Year range selector
