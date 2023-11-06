@@ -1,3 +1,6 @@
+> **Note**
+> The code for "Milestone 4: Static Vis Implementation" was saved in the [m4 branch](https://github.com/idiotWu/CS541-DDPoetry/tree/m4).
+
 # Data-Driven Poetry
 
 This repo contains code for the Data-Driven Poetry in [CS 541 - Information Visualization](https://emilywall.github.io/vis/index.html) class at Emory University.
