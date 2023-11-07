@@ -1,0 +1,26 @@
+.popover {
+  display: none; // avoid flickering
+  flex-flow: column;
+  align-items: center;
+  justify-content: center;
+  position: fixed;
+  top: 0;
+  left: 0;
+  background: #eee;
+  border-radius: 4px;
+}
+
+.chart {
+  display: flex;
+
+  svg {
+    color: #233;
+  }
+}
+
+.footnote {
+  // align-self: flex-end;
+  margin-bottom: 1em;
+  font-size: 12px;
+  color: #666;
+}

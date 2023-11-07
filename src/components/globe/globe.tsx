@@ -3,7 +3,7 @@ import * as d3 from 'd3';
 import { useMemo, useRef, useEffect, useState, useCallback } from 'react';
 import { useAtom } from 'jotai';
 
-import { Legend, BarChart } from '@components';
+import { Legend, BarChart, LineChart } from '@components';
 import type { Entry, WithAverage } from '@interfaces';
 import { highlightedVerseAtom } from '@atoms';
 import { VERSES } from '@constants';
@@ -149,12 +149,13 @@ export function Globe({ indicator, data, maxValue }: GlobeProps) {
       <div className={styles.globe} ref={globeDivRef} />
       <Legend min={minGap} max={maxGap} />
       {hoveredEntry ? (
-        <BarChart
-          data={hoveredEntry}
-          indicator={indicator}
-          color={colorScale(hoveredEntry.gap)}
-          xMax={Math.ceil(maxValue)}
-        />
+        // <BarChart
+        //   data={hoveredEntry}
+        //   indicator={indicator}
+        //   color={colorScale(hoveredEntry.gap)}
+        //   xMax={Math.ceil(maxValue)}
+        // />
+        <LineChart data={hoveredEntry} indicator={indicator} yMax={maxValue} />
       ) : null}
     </div>
   );
