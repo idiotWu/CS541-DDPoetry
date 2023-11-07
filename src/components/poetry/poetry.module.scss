@@ -1,0 +1,38 @@
+.poetry {
+  overflow-y: auto;
+
+  h6 {
+    color: #ccc;
+  }
+
+  p {
+    margin: 0;
+  }
+
+  :global {
+    ::-webkit-scrollbar {
+      width: 0;
+      height: 0;
+      display: none;
+      scrollbar-width: none;
+    }
+  }
+}
+
+.verse {
+  margin-top: 20px;
+  color: #333;
+  filter: blur(3px);
+  transition: all 0.3s ease-in;
+
+  &.active,
+  &:hover {
+    color: inherit;
+    filter: none;
+  }
+}
+
+.verse-title {
+  color: #666;
+  font-size: 12px;
+}

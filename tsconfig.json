@@ -23,6 +23,8 @@
     "paths": {
       "@components": ["src/components"],
       "@interfaces": ["src/interfaces"],
+      "@constants": ["src/constants"],
+      "@atoms": ["src/atoms"],
       "@assets/*": ["src/assets/*"]
     }
   },

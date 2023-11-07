@@ -2,8 +2,14 @@
 export type Entry = {
   country: string;
   isoCode: string;
-  values: number[];
-  difference: number;
+  values: {
+    [year: string]: number[];
+  };
+  gap: number;
+};
+
+export type WithAverage<T> = T & {
+  average: number[];
 };
 
 export type Dataset = {

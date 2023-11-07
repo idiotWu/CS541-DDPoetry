@@ -12,16 +12,19 @@ export function Legend({ min, max, numTicks = 3 }: LegendProps) {
     { length: numTicks },
     (_, i) => range * (i / (numTicks - 1)),
   );
+  const noData = !Number.isFinite(range);
 
   return (
     <div className={styles.legend}>
-      <div className={styles.title}>Maximum Gap</div>
+      <div className={styles.title}>
+        Average Gap Between the Richest and the Poorest
+      </div>
       <div className={styles.ruler} />
       <div className={styles.tickWrapper}>
         {ticks.map((t, i) => {
           return (
             <span className={styles.tick} key={i}>
-              {t.toFixed(2)}
+              {noData ? 'No Data' : t.toFixed(2)}
             </span>
           );
         })}

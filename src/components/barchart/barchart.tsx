@@ -3,16 +3,16 @@ import { useRef, useEffect } from 'react';
 import { createPortal } from 'react-dom';
 import { motion } from 'framer-motion';
 
-import type { Entry } from '@interfaces';
+import type { Entry, WithAverage } from '@interfaces';
 
 import styles from './barchart.module.scss';
 
-const charMargins = { top: 60, right: 20, bottom: 40, left: 60 };
+const charMargins = { top: 60, right: 50, bottom: 40, left: 60 };
 const wealthLevels = ['poorest', 'poor', 'middle', 'rich', 'richest'];
 
 export type BarChartProps = {
   indicator: string;
-  data: Entry;
+  data: WithAverage<Entry>;
   color?: string;
   width?: number;
   height?: number;
@@ -88,7 +88,7 @@ export function BarChart({
       return;
     }
 
-    const barData = data.values.map((v, i) => ({
+    const barData = data.average.map((v, i) => ({
       wealthLevel: wealthLevels[i],
       value: v,
     }));
@@ -146,11 +146,11 @@ export function BarChart({
     valueLabels
       .attr('y', d => yAxis(d.wealthLevel)!)
       .transition()
-      .attr('x', d => xAxis(d.value) - 4)
+      .attr('x', d => xAxis(d.value) + 4)
       .duration(300)
       .style('font-size', '12px')
-      .style('fill', d3.hsl(color).l > 0.7 ? 'black' : 'white')
-      .attr('text-anchor', 'end')
+      .style('fill', 'black')
+      // .attr('text-anchor', 'end')
       .attr('dy', yAxis.bandwidth() - 5)
       .text(d => d.value.toFixed(2));
 
@@ -160,9 +160,10 @@ export function BarChart({
       .attr('x', chartWidth / 2)
       .attr('y', -20)
       .attr('text-anchor', 'middle')
-      .style('font-size', '18px')
+      .style('font-size', '16px')
+      .style('text-transform', 'capitalize')
       .style('fill', '#233')
-      .text(`${indicator} @ ${data.country}`);
+      .text(`Average ${indicator} @ ${data.country}`);
   }, [chartHeight, chartWidth, color, data, height, indicator, width]);
 
   return createPortal(
@@ -175,6 +176,9 @@ export function BarChart({
       transition={{ duration: 0.3 }}
     >
       <div className={styles.chart} ref={chartDivRef} />
+      <footer className={styles.footnote}>
+        Average gap between the richest and the poorest: {data.gap.toFixed(2)}
+      </footer>
     </motion.div>,
     document.body,
   );

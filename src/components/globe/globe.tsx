@@ -1,9 +1,12 @@
-import globeGL from 'globe.gl';
+import globeGL, { type GlobeInstance } from 'globe.gl';
 import * as d3 from 'd3';
 import { useMemo, useRef, useEffect, useState, useCallback } from 'react';
+import { useAtom } from 'jotai';
 
 import { Legend, BarChart } from '@components';
-import type { Entry } from '@interfaces';
+import type { Entry, WithAverage } from '@interfaces';
+import { highlightedVerseAtom } from '@atoms';
+import { VERSES } from '@constants';
 
 import countries from './ne_110m_admin_0_countries.json';
 import styles from './globe.module.scss';
@@ -12,11 +15,12 @@ type GeoData = {
   [conutry: string]: (typeof countries.features)[0];
 };
 
-const emptyEntry: Entry = {
+const emptyEntry: WithAverage<Entry> = {
   country: 'empty',
   isoCode: '',
-  values: [],
-  difference: -1,
+  values: {},
+  average: [],
+  gap: -1,
 };
 
 const geoData: GeoData = {};
@@ -28,23 +32,30 @@ countries.features.forEach(feat => {
 
 export type GlobeProps = {
   indicator: string;
-  data: Entry[];
+  data: WithAverage<Entry>[];
 };
 
 export function Globe({ indicator, data }: GlobeProps) {
   const globeDivRef = useRef<HTMLDivElement>(null);
-  const [hoveredEntry, setHoveredEntry] = useState<Entry | null>(null);
+  const globeRef = useRef<GlobeInstance | null>(null);
+  const [hoveredEntry, setHoveredEntry] = useState<WithAverage<Entry> | null>(
+    null,
+  );
+  const [highlightedVerse, setHighlightedVerse] = useAtom(highlightedVerseAtom);
   const colorScale = useMemo(() => {
     // [green - yellow - red] color scale
     return d3.scaleSequential(v => d3.interpolateRdYlGn(1 - v));
   }, []);
-  const globe = useMemo(() => globeGL(), []);
-  const minValue = Math.min(...data.map(d => d.difference));
-  const maxValue = Math.max(...data.map(d => d.difference));
+  const minValue = Math.min(...data.map(d => d.gap));
+  const maxValue = Math.max(...data.map(d => d.gap));
 
   const resize = useCallback(() => {
-    globe.width(window.innerWidth - 250).height(window.innerHeight);
-  }, [globe]);
+    if (!globeRef.current) {
+      return;
+    }
+
+    globeRef.current.width(window.innerWidth - 300).height(window.innerHeight);
+  }, []);
 
   useEffect(() => {
     window.addEventListener('resize', resize);
@@ -59,6 +70,9 @@ export function Globe({ indicator, data }: GlobeProps) {
       return;
     }
 
+    const globe = globeGL();
+    globeRef.current = globe;
+
     resize();
 
     // set color scale domain to [min_diff, max_diff]
@@ -72,11 +86,31 @@ export function Globe({ indicator, data }: GlobeProps) {
       .polygonsData(compositeData)
       .polygonAltitude(0.03)
       .polygonCapColor((d: any) =>
-        d.country === emptyEntry.country ? '#333' : colorScale(d.difference),
+        d.country === emptyEntry.country ? '#333' : colorScale(d.gap),
       )
       .polygonSideColor(() => 'rgba(0, 100, 0, 0.15)')
       .polygonStrokeColor(() => '#111')
       .polygonsTransitionDuration(300);
+
+    // render
+    globe(globeDivRef.current);
+
+    // auto rotate
+    const controls = globe.controls();
+    controls.autoRotate = true;
+    controls.autoRotateSpeed = 0.6;
+
+    return () => {
+      globe._destructor();
+    };
+  }, [colorScale, data, minValue, maxValue, resize]);
+
+  useEffect(() => {
+    if (!globeRef.current) {
+      return;
+    }
+
+    const globe = globeRef.current;
 
     globe.onPolygonHover((hoverD: any) => {
       const controls = globe.controls();
@@ -86,22 +120,26 @@ export function Globe({ indicator, data }: GlobeProps) {
         setHoveredEntry(null);
       } else {
         controls.autoRotate = false;
-        setHoveredEntry(hoverD as Entry);
+        setHoveredEntry(hoverD as WithAverage<Entry>);
+
+        const percentile = (hoverD.gap - minValue) / (maxValue - minValue);
+
+        if (percentile >= 0.5) {
+          setHighlightedVerse(
+            hoverD.average[0] < 0.3 ? VERSES.POOR : VERSES.RICH,
+          );
+        } else if (percentile >= 0.3) {
+          setHighlightedVerse(VERSES.ACTION);
+        } else {
+          setHighlightedVerse(VERSES.ENDING);
+        }
       }
 
       globe.polygonAltitude((d: any) =>
         d === hoverD && d.country !== emptyEntry.country ? 0.1 : 0.03,
       );
     });
-
-    // render
-    globe(globeDivRef.current);
-
-    // auto rotate
-    const controls = globe.controls();
-    controls.autoRotate = true;
-    controls.autoRotateSpeed = 0.6;
-  }, [colorScale, data, globe, minValue, maxValue, resize]);
+  }, [highlightedVerse, maxValue, minValue, setHighlightedVerse]);
 
   return (
     <div className={styles.container}>
@@ -111,7 +149,7 @@ export function Globe({ indicator, data }: GlobeProps) {
         <BarChart
           data={hoveredEntry}
           indicator={indicator}
-          color={colorScale(hoveredEntry.difference)}
+          color={colorScale(hoveredEntry.gap)}
         />
       ) : null}
     </div>

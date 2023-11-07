@@ -46,6 +46,7 @@ module.exports = {
     'react/no-array-index-key': 'off',
     'react/prop-types': 'off',
     'no-prototype-builtins': 'off',
+    'react/no-unescaped-entities': 'off',
 
     // following rules enable auto-fix for `no-unused-imports`
     'no-unused-vars': 'off',
