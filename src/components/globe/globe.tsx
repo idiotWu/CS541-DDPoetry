@@ -41,7 +41,7 @@ export function Globe({ indicator, data }: GlobeProps) {
   const [hoveredEntry, setHoveredEntry] = useState<WithAverage<Entry> | null>(
     null,
   );
-  const [highlightedVerse, setHighlightedVerse] = useAtom(highlightedVerseAtom);
+  const [, setHighlightedVerse] = useAtom(highlightedVerseAtom);
   const colorScale = useMemo(() => {
     // [green - yellow - red] color scale
     return d3.scaleSequential(v => d3.interpolateRdYlGn(1 - v));
@@ -92,26 +92,6 @@ export function Globe({ indicator, data }: GlobeProps) {
       .polygonStrokeColor(() => '#111')
       .polygonsTransitionDuration(300);
 
-    // render
-    globe(globeDivRef.current);
-
-    // auto rotate
-    const controls = globe.controls();
-    controls.autoRotate = true;
-    controls.autoRotateSpeed = 0.6;
-
-    return () => {
-      globe._destructor();
-    };
-  }, [colorScale, data, minValue, maxValue, resize]);
-
-  useEffect(() => {
-    if (!globeRef.current) {
-      return;
-    }
-
-    const globe = globeRef.current;
-
     globe.onPolygonHover((hoverD: any) => {
       const controls = globe.controls();
 
@@ -146,7 +126,19 @@ export function Globe({ indicator, data }: GlobeProps) {
         d === hoverD && d.country !== emptyEntry.country ? 0.1 : 0.03,
       );
     });
-  }, [highlightedVerse, maxValue, minValue, setHighlightedVerse]);
+
+    // render
+    globe(globeDivRef.current);
+
+    // auto rotate
+    const controls = globe.controls();
+    controls.autoRotate = true;
+    controls.autoRotateSpeed = 0.6;
+
+    return () => {
+      globe._destructor();
+    };
+  }, [colorScale, data, minValue, maxValue, resize, setHighlightedVerse]);
 
   return (
     <div className={styles.container}>
