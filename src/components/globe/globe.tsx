@@ -125,9 +125,16 @@ export function Globe({ indicator, data }: GlobeProps) {
         const percentile = (hoverD.gap - minValue) / (maxValue - minValue);
 
         if (percentile >= 0.5) {
-          setHighlightedVerse(
-            hoverD.average[0] < 0.3 ? VERSES.POOR : VERSES.RICH,
-          );
+          let targetVerse: VERSES;
+
+          if (hoverD.average[0] > hoverD.average[4]) {
+            // invert the measurement when showing negative data
+            targetVerse = hoverD.average[0] > 0.7 ? VERSES.POOR : VERSES.RICH;
+          } else {
+            targetVerse = hoverD.average[0] < 0.3 ? VERSES.POOR : VERSES.RICH;
+          }
+
+          setHighlightedVerse(targetVerse);
         } else if (percentile >= 0.3) {
           setHighlightedVerse(VERSES.ACTION);
         } else {
