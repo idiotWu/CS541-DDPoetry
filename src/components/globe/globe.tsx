@@ -32,10 +32,11 @@ countries.features.forEach(feat => {
 
 export type GlobeProps = {
   indicator: string;
+  maxValue: number;
   data: WithAverage<Entry>[];
 };
 
-export function Globe({ indicator, data }: GlobeProps) {
+export function Globe({ indicator, data, maxValue }: GlobeProps) {
   const globeDivRef = useRef<HTMLDivElement>(null);
   const globeRef = useRef<GlobeInstance | null>(null);
   const [hoveredEntry, setHoveredEntry] = useState<WithAverage<Entry> | null>(
@@ -46,8 +47,8 @@ export function Globe({ indicator, data }: GlobeProps) {
     // [green - yellow - red] color scale
     return d3.scaleSequential(v => d3.interpolateRdYlGn(1 - v));
   }, []);
-  const minValue = Math.min(...data.map(d => d.gap));
-  const maxValue = Math.max(...data.map(d => d.gap));
+  const minGap = Math.min(...data.map(d => d.gap));
+  const maxGap = Math.max(...data.map(d => d.gap));
 
   const resize = useCallback(() => {
     if (!globeRef.current) {
@@ -76,7 +77,7 @@ export function Globe({ indicator, data }: GlobeProps) {
     resize();
 
     // set color scale domain to [min_diff, max_diff]
-    colorScale.domain([minValue, maxValue]);
+    colorScale.domain([minGap, maxGap]);
 
     const compositeData = composeData(data);
 
@@ -102,16 +103,18 @@ export function Globe({ indicator, data }: GlobeProps) {
         controls.autoRotate = false;
         setHoveredEntry(hoverD as WithAverage<Entry>);
 
-        const percentile = (hoverD.gap - minValue) / (maxValue - minValue);
+        const percentile = (hoverD.gap - minGap) / (maxGap - minGap);
 
         if (percentile >= 0.5) {
           let targetVerse: VERSES;
 
           if (hoverD.average[0] > hoverD.average[4]) {
             // invert the measurement when showing negative data
-            targetVerse = hoverD.average[0] > 0.7 ? VERSES.POOR : VERSES.RICH;
+            targetVerse =
+              hoverD.average[0] / maxValue > 0.7 ? VERSES.POOR : VERSES.RICH;
           } else {
-            targetVerse = hoverD.average[0] < 0.3 ? VERSES.POOR : VERSES.RICH;
+            targetVerse =
+              hoverD.average[0] / maxValue < 0.3 ? VERSES.POOR : VERSES.RICH;
           }
 
           setHighlightedVerse(targetVerse);
@@ -137,18 +140,20 @@ export function Globe({ indicator, data }: GlobeProps) {
 
     return () => {
       globe._destructor();
+      setHoveredEntry(null);
     };
-  }, [colorScale, data, minValue, maxValue, resize, setHighlightedVerse]);
+  }, [colorScale, data, minGap, maxGap, resize, setHighlightedVerse, maxValue]);
 
   return (
     <div className={styles.container}>
       <div className={styles.globe} ref={globeDivRef} />
-      <Legend min={minValue} max={maxValue} />
+      <Legend min={minGap} max={maxGap} />
       {hoveredEntry ? (
         <BarChart
           data={hoveredEntry}
           indicator={indicator}
           color={colorScale(hoveredEntry.gap)}
+          xMax={Math.ceil(maxValue)}
         />
       ) : null}
     </div>

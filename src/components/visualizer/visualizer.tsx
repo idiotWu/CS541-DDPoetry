@@ -34,8 +34,9 @@ function extractByIndicator(
     entry.values[row.year] ??= [];
 
     const wealthLevel = parseInt(quintile[0], 10) - 1;
+    const value = parseFloat(row[indicator]);
 
-    entry.values[row.year][wealthLevel] = parseFloat(row[indicator]);
+    entry.values[row.year][wealthLevel] = value;
 
     countryEntries[row.country] = entry;
   });
@@ -46,7 +47,7 @@ function extractByIndicator(
   for (const country of Object.values(countryEntries)) {
     for (const [k, v] of Object.entries(country.values)) {
       // filter out incomplete data
-      if (v.length !== 5) {
+      if (v.length !== 5 || (v as (number | undefined)[]).includes(undefined)) {
         Reflect.deleteProperty(country.values, k);
       }
     }
@@ -89,6 +90,7 @@ export function Visulaizer() {
   }
 
   const selectedData: WithAverage<Entry>[] = [];
+  let maxValue = 1;
 
   for (const entry of data[activeIndicator]) {
     const slice = {
@@ -104,6 +106,7 @@ export function Visulaizer() {
 
       if (year >= yearBegin && year <= yearEnd) {
         slice.values[year] = v;
+        maxValue = Math.max(maxValue, ...v);
 
         v.forEach((val, idx) => {
           sum[idx] += val;
@@ -122,6 +125,10 @@ export function Visulaizer() {
   }
 
   return (
-    <Globe indicator={indicators[activeIndicator][0]} data={selectedData} />
+    <Globe
+      indicator={indicators[activeIndicator][0]}
+      data={selectedData}
+      maxValue={maxValue}
+    />
   );
 }

@@ -34,6 +34,12 @@ The scrolling of the poetry is based on the hovered country:
 3. Else if the gap value of the hovered country is between the upper 70% and the upper 30% (i.e., the country is rendered in yellow colors), scroll to the "The Call for Change" verse to call for educational revolution.
 4. Otherwise, the gap will be within the lower 30% (i.e., the country is rendered in green colors), which means there is no significant difference between the richest and the poorest. Therefore, we will scroll to the "The Dream of Educational Equality" verse.
 
+## About Line Plots
+
+I also tried to add line plots to the visualization, but it turned out that the line plots might not be suitable for this dataset since it contained plenty of missing values:
+
+![Line Plot](public/line-chart.png)
+
 ## Local Development Setup
 
 1. Install node.js (18 or 20): https://nodejs.org/en/download

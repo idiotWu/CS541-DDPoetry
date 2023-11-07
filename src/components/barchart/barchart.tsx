@@ -16,6 +16,8 @@ export type BarChartProps = {
   color?: string;
   width?: number;
   height?: number;
+  xMin?: number;
+  xMax?: number;
 };
 
 export function BarChart({
@@ -24,6 +26,8 @@ export function BarChart({
   color = '#69b3a2',
   width = 500,
   height = 300,
+  xMin = 0,
+  xMax = 1,
 }: BarChartProps) {
   const chartDivRef = useRef<HTMLDivElement>(null);
   const popoverDivRef = useRef<HTMLDivElement>(null);
@@ -66,7 +70,7 @@ export function BarChart({
     // add chart
     const chart = svg.append('g').attr('class', 'chart');
 
-    const xAxis = d3.scaleLinear().domain([0, 1]).range([0, chartWidth]);
+    const xAxis = d3.scaleLinear().domain([xMin, xMax]).range([0, chartWidth]);
     const yAxis = d3
       .scaleBand()
       .range([0, chartHeight])
@@ -81,7 +85,7 @@ export function BarChart({
 
     // add title
     chart.append('text').attr('class', 'chart-title');
-  }, [chartHeight, chartWidth]);
+  }, [chartHeight, chartWidth, xMax, xMin]);
 
   useEffect(() => {
     if (!chartDivRef.current) {
@@ -93,7 +97,7 @@ export function BarChart({
       value: v,
     }));
 
-    const xAxis = d3.scaleLinear().domain([0, 1]).range([0, chartWidth]);
+    const xAxis = d3.scaleLinear().domain([xMin, xMax]).range([0, chartWidth]);
     const yAxis = d3
       .scaleBand()
       .range([0, chartHeight])
@@ -164,7 +168,18 @@ export function BarChart({
       .style('text-transform', 'capitalize')
       .style('fill', '#233')
       .text(`Average ${indicator} @ ${data.country}`);
-  }, [chartHeight, chartWidth, color, data, height, indicator, width]);
+  }, [
+    chartHeight,
+    chartWidth,
+    color,
+    data.average,
+    data.country,
+    height,
+    indicator,
+    width,
+    xMax,
+    xMin,
+  ]);
 
   return createPortal(
     <motion.div
